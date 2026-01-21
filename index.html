@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bansko Trip Calculator</title>
+
+<style>
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f6f7fb;color:#111}
+  .wrap{max-width:1020px;margin:auto;padding:16px}
+  h1{font-size:22px;margin:8px 0 16px}
+  .card{background:#fff;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+  h2{font-size:16px;margin:0 0 10px}
+  h3{font-size:15px;margin:0 0 8px}
+  label{display:block;margin:8px 0;line-height:1.3}
+  .muted{color:#555;font-size:13px}
+  .pill{background:#eef2ff;padding:2px 8px;border-radius:999px;font-size:12px;margin-left:6px}
+  .stack{display:grid;gap:10px}
+  .itemCard{border:1px solid #eee;border-radius:12px;padding:12px}
+  .itemHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .itemHeader b{font-size:14px}
+  .indent{margin-left:24px;margin-top:6px}
+  input[type="number"], select{
+    width:100%;padding:10px;border-radius:10px;border:1px solid #d7d9e2;font-size:14px;box-sizing:border-box
+  }
+  input[type="range"]{width:100%}
+  ul{margin:6px 0 0 18px}
+  hr{border:0;border-top:1px solid #eee;margin:12px 0}
+  .total{
+    position:sticky;bottom:12px;background:#111;color:#fff;border-radius:14px;padding:14px;
+    display:flex;justify-content:space-between;align-items:center;gap:12px
+  }
+  .total strong{font-size:18px}
+  button{border:none;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+  .btn{background:#fff;color:#111}
+  .tiny{font-size:12px;opacity:.85}
+
+  /* ---- Horizontal layout like your old code ---- */
+  .row { display:flex; gap:12px; flex-wrap:wrap; }
+  .col { flex:1 1 300px; }
+  .colCard { background:#fff; border:1px solid #eee; border-radius:12px; padding:12px; }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <h1>Bansko Trip Calculator</h1>
+
+  <!-- 0) PEOPLE COUNT -->
+  <div class="card">
+    <h2>0) How many people are coming?</h2>
+    <label class="muted">Number of people</label>
+    <input id="peopleCount" type="number" min="1" value="1" />
+    <div class="muted" style="margin-top:6px;">This automatically creates Pass + Rental sections for each person.</div>
+  </div>
+
+  <!-- 1) HOTEL -->
+  <div class="card">
+    <h2>1) Choose Hotel</h2>
+
+    <label>
+      <input type="radio" name="hotel" value="trakia" checked>
+      <b>Trakia Trips</b> <span class="pill">€280 / person</span>
+      <div class="muted">Hotel + Breakfast & Dinner, Trakia parties, <b>Bus transport included</b></div>
+      <div class="muted"><b>Total for group:</b> <span id="hotelTrakiaTotal">€280</span></div>
+    </label>
+
+    <label>
+      <input type="radio" name="hotel" value="ayad">
+      <b>Ayad Trips</b> <span class="pill">€149 (flat total)</span>
+      <div class="muted">Hotel only, no meals, no parties, <b>no transport included</b></div>
+      <div class="muted"><b>Total:</b> <span id="hotelAyadTotal">€149</span></div>
+    </label>
+
+    <label>
+      <input type="radio" name="hotel" value="own">
+      <b>Own hotel</b>
+      <div class="muted">Enter total hotel cost for the whole group</div>
+    </label>
+
+    <div id="ownHotelBox" style="display:none;margin-top:10px;">
+      <label class="muted">Own hotel total price (€)</label>
+      <input id="ownHotelPrice" type="number" min="0" value="0" />
+    </div>
+  </div>
+
+  <!-- 2) CAR RENTAL -->
+  <div class="card">
+    <h2>2) Car rental</h2>
+
+    <label><input id="carEnabled" type="checkbox"> Rent a car?</label>
+
+    <div id="carBox" style="display:none;margin-top:10px;">
+      <div class="muted">
+        Average price is around:
+        <ul>
+          <li>€50–70 for 5 days</li>
+          <li>€40–60 for 4 days</li>
+          <li>€30–50 for 3 days</li>
+        </ul>
+      </div>
+
+      <label class="muted" style="margin-top:10px;">Estimated car rental price (total)</label>
+      <input id="carPrice" type="range" min="40" max="80" value="60" />
+      <div><b id="carPriceOut">€60</b> <span class="muted">(slider €40–€80)</span></div>
+    </div>
+  </div>
+
+  <!-- 3) LIFT PASSES -->
+  <div class="card">
+    <h2>3) Lift passes</h2>
+    <div id="passesList" class="stack" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- 4) RENTALS -->
+  <div class="card">
+    <h2>4) Rentals (BRI Ski Rent)</h2>
+    <div class="muted">"Pirin" Str. 117, 2770 Bansko, Bulgaria</div>
+
+    <div id="rentalsList" class="stack" style="margin-top:10px;"></div>
+
+    <hr>
+
+    <label>
+      <input id="gondolaEnabled" type="checkbox">
+      Add Gondola lift tickets <span class="pill">€27 each</span>
+    </label>
+
+    <div id="gondolaQtyBox" style="display:none;margin-top:10px;">
+      <label class="muted">How many tickets?</label>
+      <input id="gondolaQty" type="number" min="1" value="1" />
+    </div>
+  </div>
+
+  <!-- TOTAL -->
+  <div class="total">
+    <div>
+      <div class="tiny">Final total</div>
+      <strong id="totalOut">€0</strong>
+    </div>
+    <button class="btn" id="resetBtn">Reset</button>
+  </div>
+</div>
+
+<script>
+  const PRICES = {
+    hotel: { trakia: 280, ayad: 149 }, // ayad is FLAT total (not per person)
+    pass: { none: 0, "1": 59, "2": 115, "3": 172 },
+    ski: {
+      individual: { normal: 20, online: 16 },
+      "2day": { normal: 40, online: 32 },
+      "3day": { normal: 56, online: 45 }
+    },
+    board: {
+      individual: { normal: 26, online: 20 },
+      "2day": { normal: 51, online: 45 },
+      "3day": { normal: 69, online: 55 }
+    },
+    gondola: 27
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const money = (n) => "€" + Math.round(Number(n || 0));
+  const clampInt = (v, min) => {
+    v = parseInt(v || "0", 10);
+    return Number.isFinite(v) ? Math.max(min, v) : min;
+  };
+  const radio = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value;
+
+  function renderPasses(people) {
+    const host = $("passesList");
+    host.innerHTML = "";
+    for (let i = 1; i <= people; i++) {
+      const div = document.createElement("div");
+      div.className = "itemCard";
+      div.innerHTML = `
+        <div class="itemHeader">
+          <b>Person #${i} — Lift pass</b>
+          <span class="muted" id="passPriceOut_${i}">€0</span>
+        </div>
+
+        <label><input type="radio" name="pass_${i}" value="none" checked> <b>No pass</b></label>
+        <label><input type="radio" name="pass_${i}" value="1"> <b>1 day Ski pass</b> <span class="pill">€59</span></label>
+        <label><input type="radio" name="pass_${i}" value="2"> <b>2 day Ski pass</b> <span class="pill">€115</span></label>
+        <label><input type="radio" name="pass_${i}" value="3"> <b>3 day Ski pass</b> <span class="pill">€172</span></label>
+      `;
+      host.appendChild(div);
+    }
+  }
+
+  /* Rentals: Ski (left) + Snowboard (right) side-by-side like old code */
+  function renderRentals(people) {
+    const host = $("rentalsList");
+    host.innerHTML = "";
+    for (let i = 1; i <= people; i++) {
+      const div = document.createElement("div");
+      div.className = "itemCard";
+      div.innerHTML = `
+        <div class="itemHeader">
+          <b>Person #${i} — Rentals</b>
+          <span class="muted" id="rentalPriceOut_${i}">€0</span>
+        </div>
+
+        <label>
+          <input type="checkbox" id="noRental_${i}">
+          <b>No rentals for this person</b>
+        </label>
+
+        <div id="rentContent_${i}" style="margin-top:10px;">
+          <div class="row">
+
+            <!-- SKI COLUMN -->
+            <div class="col colCard">
+              <h3>Ski Rental</h3>
+
+              <label><input type="radio" name="skiPlan_${i}" value="none" checked> <b>No ski rental</b></label>
+
+              <label>
+                <input type="radio" name="skiPlan_${i}" value="individual">
+                <b>Individual day Ski</b> <span class="pill">€20/day</span> <span class="muted">(Online: €16)</span>
+              </label>
+
+              <div id="skiDaysBox_${i}" style="display:none;">
+                <label class="muted">How many days?</label>
+                <input type="number" min="1" value="1" id="skiDays_${i}">
+              </div>
+
+              <label>
+                <input type="radio" name="skiPlan_${i}" value="2day">
+                <b>2 day Ski</b> <span class="pill">€40</span> <span class="muted">(Online: €32)</span>
+              </label>
+
+              <label>
+                <input type="radio" name="skiPlan_${i}" value="3day">
+                <b>3 day Ski</b> <span class="pill">€56</span> <span class="muted">(Online: €45)</span>
+              </label>
+
+              <label style="margin-top:10px;">
+                <input type="checkbox" id="skiOnline_${i}"> Use online price
+              </label>
+            </div>
+
+            <!-- SNOWBOARD COLUMN -->
+            <div class="col colCard">
+              <h3>Snowboard Rental</h3>
+
+              <label><input type="radio" name="boardPlan_${i}" value="none" checked> <b>No snowboard rental</b></label>
+
+              <label>
+                <input type="radio" name="boardPlan_${i}" value="individual">
+                <b>Individual day Snowboard</b> <span class="pill">€26/day</span> <span class="muted">(Online: €20)</span>
+              </label>
+
+              <div id="boardDaysBox_${i}" style="display:none;">
+                <label class="muted">How many days?</label>
+                <input type="number" min="1" value="1" id="boardDays_${i}">
+              </div>
+
+              <label>
+                <input type="radio" name="boardPlan_${i}" value="2day">
+                <b>2 day Snowboard</b> <span class="pill">€51</span> <span class="muted">(Online: €45)</span>
+              </label>
+
+              <label>
+                <input type="radio" name="boardPlan_${i}" value="3day">
+                <b>3 day Snowboard</b> <span class="pill">€69</span> <span class="muted">(Online: €55)</span>
+              </label>
+
+              <label style="margin-top:10px;">
+                <input type="checkbox" id="boardOnline_${i}"> Use online price
+              </label>
+            </div>
+
+          </div>
+        </div>
+      `;
+      host.appendChild(div);
+    }
+  }
+
+  function updateRentalUI(people) {
+    for (let i = 1; i <= people; i++) {
+      const noRental = $(`noRental_${i}`)?.checked;
+      const box = $(`rentContent_${i}`);
+      if (box) box.style.display = noRental ? "none" : "block";
+
+      const skiPlan = document.querySelector(`input[name="skiPlan_${i}"]:checked`)?.value || "none";
+      const boardPlan = document.querySelector(`input[name="boardPlan_${i}"]:checked`)?.value || "none";
+
+      const skiDaysBox = $(`skiDaysBox_${i}`);
+      const boardDaysBox = $(`boardDaysBox_${i}`);
+
+      if (skiDaysBox) skiDaysBox.style.display = (skiPlan === "individual") ? "block" : "none";
+      if (boardDaysBox) boardDaysBox.style.display = (boardPlan === "individual") ? "block" : "none";
+    }
+  }
+
+  function calcTotal() {
+    const people = clampInt($("peopleCount").value, 1);
+
+    // show totals under hotel options
+    $("hotelTrakiaTotal").textContent = money(PRICES.hotel.trakia * people);
+    $("hotelAyadTotal").textContent = money(PRICES.hotel.ayad); // flat
+
+    // toggles
+    $("ownHotelBox").style.display = (radio("hotel") === "own") ? "block" : "none";
+    $("carBox").style.display = $("carEnabled").checked ? "block" : "none";
+    $("carPriceOut").textContent = money($("carPrice").value);
+    $("gondolaQtyBox").style.display = $("gondolaEnabled").checked ? "block" : "none";
+
+    updateRentalUI(people);
+
+    let total = 0;
+
+    // Hotel
+    const h = radio("hotel");
+    if (h === "own") total += Math.max(0, Number($("ownHotelPrice").value || 0));
+    else if (h === "trakia") total += PRICES.hotel.trakia * people;
+    else if (h === "ayad") total += PRICES.hotel.ayad;
+
+    // Car
+    if ($("carEnabled").checked) total += Math.max(0, Number($("carPrice").value || 0));
+
+    // Passes
+    for (let i = 1; i <= people; i++) {
+      const v = document.querySelector(`input[name="pass_${i}"]:checked`)?.value || "none";
+      const price = PRICES.pass[v] || 0;
+      const out = $(`passPriceOut_${i}`);
+      if (out) out.textContent = money(price);
+      total += price;
+    }
+
+    // Rentals per person (Ski + Snowboard independently)
+    for (let i = 1; i <= people; i++) {
+      let personTotal = 0;
+
+      const noRental = $(`noRental_${i}`)?.checked;
+      if (!noRental) {
+        // Ski
+        const skiPlan = document.querySelector(`input[name="skiPlan_${i}"]:checked`)?.value || "none";
+        const skiOnline = !!$(`skiOnline_${i}`)?.checked;
+
+        if (skiPlan === "individual") {
+          const days = clampInt($(`skiDays_${i}`)?.value || 1, 1);
+          const perDay = skiOnline ? PRICES.ski.individual.online : PRICES.ski.individual.normal;
+          personTotal += days * perDay;
+        } else if (skiPlan === "2day" || skiPlan === "3day") {
+          personTotal += skiOnline ? PRICES.ski[skiPlan].online : PRICES.ski[skiPlan].normal;
+        }
+
+        // Snowboard
+        const boardPlan = document.querySelector(`input[name="boardPlan_${i}"]:checked`)?.value || "none";
+        const boardOnline = !!$(`boardOnline_${i}`)?.checked;
+
+        if (boardPlan === "individual") {
+          const days = clampInt($(`boardDays_${i}`)?.value || 1, 1);
+          const perDay = boardOnline ? PRICES.board.individual.online : PRICES.board.individual.normal;
+          personTotal += days * perDay;
+        } else if (boardPlan === "2day" || boardPlan === "3day") {
+          personTotal += boardOnline ? PRICES.board[boardPlan].online : PRICES.board[boardPlan].normal;
+        }
+      }
+
+      const out = $(`rentalPriceOut_${i}`);
+      if (out) out.textContent = money(personTotal);
+      total += personTotal;
+    }
+
+    // Gondola
+    if ($("gondolaEnabled").checked) {
+      const qty = clampInt($("gondolaQty").value, 1);
+      total += qty * PRICES.gondola;
+    }
+
+    $("totalOut").textContent = money(total);
+  }
+
+  function hookAll() {
+    document.querySelectorAll("input, select").forEach(el => {
+      el.oninput = null; el.onchange = null;
+      el.addEventListener("input", calcTotal);
+      el.addEventListener("change", calcTotal);
+    });
+  }
+
+  function rerenderPeople() {
+    const people = clampInt($("peopleCount").value, 1);
+    renderPasses(people);
+    renderRentals(people);
+    hookAll();
+    calcTotal();
+  }
+
+  $("peopleCount").addEventListener("input", rerenderPeople);
+
+  $("resetBtn").addEventListener("click", () => {
+    $("peopleCount").value = 1;
+    document.querySelector('input[name="hotel"][value="trakia"]').checked = true;
+    $("ownHotelPrice").value = 0;
+
+    $("carEnabled").checked = false;
+    $("carPrice").value = 60;
+
+    $("gondolaEnabled").checked = false;
+    $("gondolaQty").value = 1;
+
+    rerenderPeople();
+  });
+
+  // init
+  rerenderPeople();
+</script>
+</body>
+</html>
