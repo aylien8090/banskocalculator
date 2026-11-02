@@ -3,412 +3,489 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Bansko Trip Calculator</title>
+<title>Bansko with Ayad</title>
 
 <style>
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f6f7fb;color:#111}
-  .wrap{max-width:1020px;margin:auto;padding:16px}
-  h1{font-size:22px;margin:8px 0 16px}
-  .card{background:#fff;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-  h2{font-size:16px;margin:0 0 10px}
-  h3{font-size:15px;margin:0 0 8px}
-  label{display:block;margin:8px 0;line-height:1.3}
-  .muted{color:#555;font-size:13px}
-  .pill{background:#eef2ff;padding:2px 8px;border-radius:999px;font-size:12px;margin-left:6px}
-  .stack{display:grid;gap:10px}
-  .itemCard{border:1px solid #eee;border-radius:12px;padding:12px}
-  .itemHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  .itemHeader b{font-size:14px}
-  .indent{margin-left:24px;margin-top:6px}
-  input[type="number"], select{
-    width:100%;padding:10px;border-radius:10px;border:1px solid #d7d9e2;font-size:14px;box-sizing:border-box
+  :root{
+    --bg:#f4f6fb; --card:#fff; --text:#0f172a; --muted:#5b6475; --line:#e5e8f0;
+    --accent:#2563eb; --accent-soft:#e8efff; --good:#16a34a; --good-soft:#e7f7ec;
+    --warn:#b45309; --warn-soft:#fff4e0; --dark:#0f172a;
   }
-  input[type="range"]{width:100%}
-  ul{margin:6px 0 0 18px}
-  hr{border:0;border-top:1px solid #eee;margin:12px 0}
-  .total{
-    position:sticky;bottom:12px;background:#111;color:#fff;border-radius:14px;padding:14px;
-    display:flex;justify-content:space-between;align-items:center;gap:12px
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1020; --card:#151b2e; --text:#eef1f8; --muted:#9aa4ba; --line:#262e45;
+      --accent:#6b9bff; --accent-soft:#1c2a4d; --good:#4ade80; --good-soft:#12301f;
+      --warn:#fbbf24; --warn-soft:#3a2a0c; --dark:#05070f;
+    }
   }
-  .total strong{font-size:18px}
-  button{border:none;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
-  .btn{background:#fff;color:#111}
-  .tiny{font-size:12px;opacity:.85}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.45}
+  .wrap{max-width:860px;margin:auto;padding:0 16px 120px}
+  h2{font-size:22px;margin:36px 0 6px}
+  h3{font-size:16px;margin:0 0 4px}
+  p{margin:0 0 10px}
+  .muted{color:var(--muted);font-size:14px}
+  .tiny{font-size:12px;color:var(--muted)}
 
-  /* ---- Horizontal layout like your old code ---- */
-  .row { display:flex; gap:12px; flex-wrap:wrap; }
-  .col { flex:1 1 300px; }
-  .colCard { background:#fff; border:1px solid #eee; border-radius:12px; padding:12px; }
+  /* hero */
+  .hero{background:linear-gradient(135deg,#1e3a8a,#2563eb 55%,#38bdf8);color:#fff;padding:56px 16px 48px;text-align:center}
+  .hero-in{max-width:860px;margin:auto}
+  .eyebrow{display:inline-block;background:rgba(255,255,255,.18);padding:5px 12px;border-radius:999px;font-size:13px;font-weight:600;margin-bottom:14px}
+  .hero h1{font-size:clamp(30px,6vw,46px);margin:0 0 10px;line-height:1.1}
+  .hero p{font-size:17px;opacity:.95;max-width:560px;margin:0 auto 22px}
+  .cta{display:inline-block;background:#fff;color:#1e3a8a;font-weight:700;padding:13px 22px;border-radius:12px;text-decoration:none}
+  .stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+  .stat{background:rgba(255,255,255,.14);border-radius:12px;padding:10px 16px;min-width:110px}
+  .stat b{display:block;font-size:20px}
+  .stat span{font-size:12px;opacity:.9}
+
+  /* cards */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:14px}
+  .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:14px}
+  .tag{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+  .tag.good{background:var(--good-soft);color:var(--good)}
+  .tag.warn{background:var(--warn-soft);color:var(--warn)}
+  .price{font-size:26px;font-weight:800;margin:6px 0}
+  .price small{font-size:13px;font-weight:600;color:var(--muted)}
+  ul.tick{list-style:none;padding:0;margin:8px 0 0}
+  ul.tick li{padding-left:22px;position:relative;margin:5px 0;font-size:14px}
+  ul.tick li::before{content:"✓";position:absolute;left:0;color:var(--good);font-weight:700}
+  ul.tick li.no::before{content:"✕";color:#dc2626}
+  .tile{border:2px solid var(--line);cursor:pointer}
+  .tile.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .info{margin:4px 0;font-size:14px}
+
+  /* agenda */
+  .time{display:grid;grid-template-columns:78px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+  .time:first-child{border-top:0}
+  .time b{color:var(--accent)}
+
+  /* calculator */
+  .step{margin-top:14px}
+  .step h3 span{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;margin-right:8px}
+  .opts{display:grid;gap:8px;margin-top:10px}
+  .opts.two{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .opt{display:block;cursor:pointer}
+  .opt input{position:absolute;opacity:0;pointer-events:none}
+  .box{display:block;border:2px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--card);transition:.12s}
+  .opt:hover .box{border-color:var(--accent)}
+  .opt input:checked + .box{border-color:var(--accent);background:var(--accent-soft)}
+  .opt input:focus-visible + .box{outline:3px solid var(--accent);outline-offset:2px}
+  .box .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+  .box .top b{font-size:15px}
+  .box .top em{font-style:normal;font-weight:700;white-space:nowrap}
+  .box .sub{display:block;font-size:13px;color:var(--muted);margin-top:3px}
+  .chips{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+  .chips .opt{flex:1 1 70px}
+  .chips .box{text-align:center;padding:9px 6px;font-weight:700}
+  .sub-block{margin-top:12px}
+  .be{display:block;margin-top:6px;font-size:13px;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:5px 9px;border-radius:8px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  input[type=number]{width:100%;margin-top:6px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:15px}
+  details{margin-top:12px;border:1px dashed var(--line);border-radius:12px;padding:10px 13px}
+  summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14px}
+  td{padding:6px 0;border-top:1px solid var(--line)}
+  td:last-child{text-align:right;font-weight:600}
+  .hidden{display:none}
+
+  /* receipt */
+  .receipt .row{display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line);font-size:15px}
+  .receipt .row:first-child{border-top:0}
+  .receipt .row span:last-child{font-weight:700}
+  .cmp{margin-top:12px;background:var(--good-soft);color:var(--text);border-radius:12px;padding:11px 13px;font-size:14px}
+  .cmp b{color:var(--good)}
+
+  /* sticky total */
+  .total{position:fixed;left:0;right:0;bottom:0;background:var(--dark);color:#fff;padding:12px 16px;z-index:10}
+  .total-in{max-width:860px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .total small{display:block;font-size:12px;opacity:.75}
+  .total strong{font-size:24px}
+  button{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:#fff;color:#0f172a;font-size:14px}
+  footer{margin-top:30px;text-align:center}
+
+  /* phones */
+  @media (max-width:600px){
+    .hero{padding:36px 16px 32px}
+    .hero p{font-size:15px}
+    h2{font-size:20px;margin-top:28px}
+    .grid{grid-template-columns:1fr}
+    .stat{flex:1 1 100px;min-width:0;padding:8px 10px}
+    .stat b{font-size:16px}
+    .time{grid-template-columns:1fr;gap:2px}
+    .box .top{flex-wrap:wrap;gap:2px 10px}
+    .box{padding:12px}
+    .receipt .row{gap:12px}
+    .receipt .row span:first-child{min-width:0}
+    .receipt .row span:last-child{white-space:nowrap}
+    .total strong{font-size:22px}
+    .wrap{padding-bottom:100px}
+  }
+  /* 16px inputs stop iPhones zooming in when tapped */
+  input[type=number]{font-size:16px}
+  summary{padding:4px 0}
 </style>
 </head>
 
 <body>
-<div class="wrap">
-  <h1>Bansko Trip Calculator</h1>
 
-  <!-- 0) PEOPLE COUNT -->
-  <div class="card">
-    <h2>0) How many people are coming?</h2>
-    <label class="muted">Number of people</label>
-    <input id="peopleCount" type="number" min="1" value="1" />
-    <div class="muted" style="margin-top:6px;">This automatically creates Pass + Rental sections for each person.</div>
+<header class="hero">
+  <div class="hero-in">
+    <span class="eyebrow">19–22 March 2027 · Bansko, Bulgaria</span>
+    <h1>Ski Bansko with Ayad</h1>
+    <p>The information you actually need: dates, prices and the day plan. Then pick what you want and see what you pay.</p>
+    <a class="cta" href="#calc">Work out my price ↓</a>
+    <div class="stats">
+      <div class="stat"><b>Approx. <span class="hp">€70</span></b><span>hotel per person</span></div>
+      <div class="stat"><b>€40 / €53</b><span>student half / full day</span></div>
+      <div class="stat"><b>from €13.60</b><span>ski + boots rental</span></div>
+    </div>
   </div>
+</header>
 
-  <!-- 1) HOTEL -->
-  <div class="card">
-    <h2>1) Choose Hotel</h2>
+<main class="wrap">
 
-    <label>
-      <input type="radio" name="hotel" value="trakia" checked>
-      <b>Trakia Trips</b> <span class="pill">€280 / person</span>
-      <div class="muted">Hotel + Breakfast & Dinner, Trakia parties, <b>Bus transport included</b></div>
-      <div class="muted"><b>Total for group:</b> <span id="hotelTrakiaTotal">€280</span></div>
-    </label>
+  <!-- WHY -->
+  <h2>The trips at a glance</h2>
+  <p class="muted">Dates, length, price and what's included.</p>
 
-    <label>
-      <input type="radio" name="hotel" value="ayad">
-      <b>Ayad Trips</b> <span class="pill">€149 (flat total)</span>
-      <div class="muted">Hotel only, no meals, no parties, <b>no transport included</b></div>
-      <div class="muted"><b>Total:</b> <span id="hotelAyadTotal">€149</span></div>
-    </label>
+  <div class="grid">
+    <div class="card tile" id="tile_eprox" data-key="eprox">
+      <span class="tag good">Ayad Trips</span>
+      <div class="price">Approx. <span class="hp">€70</span> <small>hotel, per person</small></div>
+      <p class="tiny">19–22 March 2027 · 4 days, 3 nights · 2 full days to ski</p>
+      <p class="info">Hotel, approx. <span class="hp">€70</span> each</p>
+      <p class="info">Student lift passes: €40 half day / €53 full day</p>
+      <p class="info">Ski or board + boots from €13.60 a day</p>
+      <p class="info">Car and fuel split between everyone coming</p>
+    </div>
 
-    <label>
-      <input type="radio" name="hotel" value="own">
-      <b>Own hotel</b>
-      <div class="muted">Enter total hotel cost for the whole group</div>
-    </label>
+    <div class="card tile" id="tile_takeover" data-key="takeover">
+      <span class="tag">Takeover Ski</span>
+      <div class="price">£165 <small>per person (approx. €<span id="takeoverEur">190</span>)</small></div>
+      <p class="tiny">19–21 March 2027 · 3 days, 2 nights</p>
+      <p class="info">Hotel + breakfast &amp; dinner</p>
+      <p class="info">Takeover parties</p>
+      <p class="info">Bus transport</p>
+      <p class="info">No lift pass, no ski or board rental</p>
+    </div>
 
-    <div id="ownHotelBox" style="display:none;margin-top:10px;">
-      <label class="muted">Own hotel total price (€)</label>
-      <input id="ownHotelPrice" type="number" min="0" value="0" />
+    <div class="card tile" id="tile_takeoverDisc" data-key="takeoverDisc">
+      <span class="tag">Takeover Ski · discounted</span>
+      <div class="price">£155 <small>per person (approx. €<span id="takeoverDiscEur">178</span>)</small></div>
+      <p class="tiny">19–21 March 2027 · 3 days, 2 nights</p>
+      <p class="info">Hotel + breakfast &amp; dinner</p>
+      <p class="info">Takeover parties</p>
+      <p class="info">Bus transport</p>
+      <p class="info">No lift pass, no ski or board rental</p>
+    </div>
+
+    <div class="card tile" id="tile_trakiaA" data-key="trakiaA">
+      <span class="tag warn">Trakia Trips</span>
+      <div class="price">€365 <small>per person</small></div>
+      <p class="tiny">5–8 March · 4 days, 3 nights</p>
+      <p class="info">Hotel + breakfast &amp; dinner</p>
+      <p class="info">Trakia parties</p>
+      <p class="info">Bus transport</p>
+      <p class="info">Dates fall over Eid al-Fitr</p>
+    </div>
+
+    <div class="card tile" id="tile_trakiaB" data-key="trakiaB">
+      <span class="tag warn">Trakia Trips</span>
+      <div class="price">€490 <small>per person</small></div>
+      <p class="tiny">4–9 March · 6 days, 5 nights</p>
+      <p class="info">Hotel + breakfast &amp; dinner</p>
+      <p class="info">Trakia parties</p>
+      <p class="info">Bus transport</p>
+      <p class="info">Dates fall over Eid al-Fitr</p>
     </div>
   </div>
 
-  <!-- 2) CAR RENTAL -->
   <div class="card">
-    <h2>2) Car rental</h2>
+    <h3>What the price difference means</h3>
+    <p class="muted" style="margin:0">Takeover covers the hotel, food, parties and bus. Lift pass and rental are extra. With us the hotel is approx. <span class="hp">€70</span>, so the extra (approx. <b id="gapEur">€120</b> per person) is yours to spend on the actual ski pass and stuff. 19–22 March also gives you 2 full days to ski.</p>
+  </div>
 
-    <label><input id="carEnabled" type="checkbox"> Rent a car?</label>
+  <!-- AGENDA -->
+  <h2>Ski day plan</h2>
+  <div class="card">
+    <div class="time"><b>07:30</b><div>Rental shop opens (open daily until 18:00).</div></div>
+    <div class="time"><b>Before 12:30</b><div>Pick up your ski or snowboard gear and boots.</div></div>
+    <div class="time"><b>12:30</b><div>Head up to the resort. This is when the student half-day pass becomes valid.</div></div>
+    <div class="time"><b>~16:00</b><div>Mountain lifts close.</div></div>
+    <div class="time"><b>17:00</b><div>Gondola closes, so the last ride down.</div></div>
+    <div class="time"><b>18:00</b><div>Whole place is closed. Return gear to the shop.</div></div>
+    <div class="time"><b>18:30–20:30</b><div>Next-day fittings are available at the rental shop.</div></div>
+  </div>
 
-    <div id="carBox" style="display:none;margin-top:10px;">
-      <div class="muted">
-        Average price is around:
-        <ul>
-          <li>€50–70 for 5 days</li>
-          <li>€40–60 for 4 days</li>
-          <li>€30–50 for 3 days</li>
-        </ul>
+  <!-- CALCULATOR -->
+  <h2 id="calc">Your price</h2>
+  <p class="muted">Tap what you want. The total updates at the bottom, and that's all you pay.</p>
+
+
+  <div class="card step">
+    <h3><span>1</span>Where are you staying?</h3>
+    <p class="muted" style="margin:0">Go with Ayad, or pick one of the other trips to see what it would cost you instead.</p>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="hotel" value="eprox" checked><span class="box">
+        <span class="top"><b>Ayad Trips · Hotel</b><em>Approx. <span class="hp">€70</span></em></span>
+        <span class="sub">19–22 March · 4 days, 3 nights · hotel only, per person. You choose the rest.</span></span></label>
+
+      <div id="hotelPriceBox" class="sub-block" style="margin:0 0 4px 8px">
+        <details>
+          <summary>Change exact hotel price</summary>
+          <label class="muted" for="hotelPrice" style="display:block;margin-top:8px">Hotel price per person (€)</label>
+          <input id="hotelPrice" type="number" min="0" step="1" value="70">
+        </details>
       </div>
 
-      <label class="muted" style="margin-top:10px;">Estimated car rental price (total)</label>
-      <input id="carPrice" type="range" min="40" max="80" value="60" />
-      <div><b id="carPriceOut">€60</b> <span class="muted">(slider €40–€80)</span></div>
+      <label class="opt"><input type="radio" name="hotel" value="takeover"><span class="box">
+        <span class="top"><b>Takeover Ski</b><em>£165 (approx. €190)</em></span>
+        <span class="sub">19–21 March · 3 days, 2 nights · hotel, breakfast &amp; dinner, parties, bus</span></span></label>
+      <label class="opt"><input type="radio" name="hotel" value="takeoverDisc"><span class="box">
+        <span class="top"><b>Takeover Ski · discounted rate</b><em>£155 (approx. €178)</em></span>
+        <span class="sub">19–21 March · 3 days, 2 nights · same inclusions</span></span></label>
+      <label class="opt"><input type="radio" name="hotel" value="trakiaA"><span class="box">
+        <span class="top"><b>Trakia Trips · 5–8 March</b><em>€365</em></span>
+        <span class="sub">4 days, 3 nights · hotel, breakfast &amp; dinner, parties, bus</span></span></label>
+      <label class="opt"><input type="radio" name="hotel" value="trakiaB"><span class="box">
+        <span class="top"><b>Trakia Trips · 4–9 March</b><em>€490</em></span>
+        <span class="sub">6 days, 5 nights · hotel, breakfast &amp; dinner, parties, bus</span></span></label>
     </div>
   </div>
 
-  <!-- 3) LIFT PASSES -->
-  <div class="card">
-    <h2>3) Lift passes</h2>
-    <div id="passesList" class="stack" style="margin-top:10px;"></div>
-  </div>
+  <div class="card step" id="carCard">
+    <h3><span>2</span>Choose transport</h3>
+    <p class="muted" style="margin:0">Car and fuel are split between everyone coming. The more people, the less each person pays.</p>
 
-  <!-- 4) RENTALS -->
-  <div class="card">
-    <h2>4) Rentals (BRI Ski Rent)</h2>
-    <div class="muted">"Pirin" Str. 117, 2770 Bansko, Bulgaria</div>
+    <details>
+      <summary>Change exact car and fuel price</summary>
+      <label class="muted" for="carCost" style="display:block;margin-top:8px">Car price (€, approx. 150)</label>
+      <input id="carCost" type="number" min="0" step="1" value="150">
+      <label class="muted" for="fuelCost" style="display:block;margin-top:8px">Fuel price (€, approx. 70)</label>
+      <input id="fuelCost" type="number" min="0" step="1" value="70">
+    </details>
 
-    <div id="rentalsList" class="stack" style="margin-top:10px;"></div>
-
-    <hr>
-
-    <label>
-      <input id="gondolaEnabled" type="checkbox">
-      Add Gondola lift tickets <span class="pill">€27 each</span>
-    </label>
-
-    <div id="gondolaQtyBox" style="display:none;margin-top:10px;">
-      <label class="muted">How many tickets?</label>
-      <input id="gondolaQty" type="number" min="1" value="1" />
+    <div id="carPeopleBox" class="sub-block">
+      <label class="muted" for="carPeople">How many people are coming? <b id="carPeopleOut">4</b></label>
+      <input id="carPeople" type="range" min="1" max="5" value="4">
+      <div id="carShareOut" class="muted" style="margin-top:6px"></div>
     </div>
   </div>
 
-  <!-- TOTAL -->
-  <div class="total">
-    <div>
-      <div class="tiny">Final total</div>
-      <strong id="totalOut">€0</strong>
+  <div class="card step">
+    <h3><span>3</span>Lift pass</h3>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="pass" value="none" checked><span class="box">
+        <span class="top"><b>No pass</b><em>€0</em></span></span></label>
+      <label class="opt"><input type="radio" name="pass" value="half"><span class="box">
+        <span class="top"><b>Student half day pass</b><em>€40 / day</em></span>
+        <span class="sub">Valid from 12:30 PM onwards. The standard student rate if you hit the slopes in the afternoon.</span></span></label>
+      <label class="opt"><input type="radio" name="pass" value="full"><span class="box">
+        <span class="top"><b>Student full day pass</b><em>€53 / day</em></span>
+        <span class="sub">All-day access.
+          <span class="be">Break-even: approx. 11:42 AM</span></span></span></label>
     </div>
-    <button class="btn" id="resetBtn">Reset</button>
+
+    <div id="passDaysBox" class="sub-block hidden">
+      <div class="muted">How many days? (2 full days to ski)</div>
+      <div class="chips">
+        <label class="opt"><input type="radio" name="passDays" value="1" checked><span class="box">1</span></label>
+        <label class="opt"><input type="radio" name="passDays" value="2"><span class="box">2</span></label>
+      </div>
+    </div>
+
+    <details>
+      <summary>Other passes (for info only, students don't need these)</summary>
+      <table>
+        <tr><td>1 day ski pass</td><td>€59</td></tr>
+        <tr><td>2 day ski pass</td><td>€115</td></tr>
+        <tr><td>3 day ski pass</td><td>€172</td></tr>
+        <tr><td>Gondola lift only (per ticket)</td><td>€27</td></tr>
+      </table>
+      <p class="tiny" style="margin:8px 0 0">Regular lift passes already include the gondola.</p>
+    </details>
+  </div>
+
+  <div class="card step">
+    <h3><span>4</span>Ski or snowboard rental</h3>
+    <p class="muted" style="margin:0">BRI Ski Rent · "Pirin" Str. 117, 2770 Bansko. Open daily 07:30–18:00. Next-day fittings 18:30–20:30.</p>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="rent" value="none" checked><span class="box">
+        <span class="top"><b>No rental</b><em>€0</em></span></span></label>
+      <label class="opt"><input type="radio" name="rent" value="ski"><span class="box">
+        <span class="top"><b>Ski + boots</b><em>from €13.60</em></span>
+        <span class="sub">1 day €13.60 · 2 days €27.20 · 3 days €37.60</span></span></label>
+      <label class="opt"><input type="radio" name="rent" value="board"><span class="box">
+        <span class="top"><b>Snowboard + boots</b><em>from €18.40</em></span>
+        <span class="sub">1 day €18.40 · 2 days €36 · 3 days €48</span></span></label>
+    </div>
+
+    <div id="rentDaysBox" class="sub-block hidden">
+      <div class="muted">How many days?</div>
+      <div class="chips">
+        <label class="opt"><input type="radio" name="rentDays" value="1" checked><span class="box">1</span></label>
+        <label class="opt"><input type="radio" name="rentDays" value="2"><span class="box">2</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECEIPT -->
+  <div class="card receipt" id="receipt">
+    <h3>Your total</h3>
+    <div class="row"><span id="rHotelLabel">Hotel</span><span id="rHotel">€0</span></div>
+    <div class="row"><span id="rCarLabel">Car</span><span id="rCar">€0</span></div>
+    <div class="row"><span id="rPassLabel">Lift pass</span><span id="rPass">€0</span></div>
+    <div class="row"><span id="rRentLabel">Rental</span><span id="rRent">€0</span></div>
+    <div class="row"><span><b>Total to pay</b></span><span id="rTotal">€0</span></div>
+    <div id="saveBox" class="cmp hidden">
+      <b>You're still saving</b>
+      <div id="saveRows"></div>
+    </div>
+    <p class="tiny" style="margin:10px 0 0">Doesn't include food, drinks or going out.</p>
+  </div>
+
+  <footer><button id="resetBtn" style="background:var(--accent);color:#fff">Reset</button></footer>
+</main>
+
+<div class="total">
+  <div class="total-in">
+    <div><small>You pay</small><strong id="totalOut">€0</strong></div>
+    <a class="cta" href="#receipt" style="padding:9px 16px;font-size:14px">See breakdown</a>
   </div>
 </div>
 
 <script>
-  const PRICES = {
-    hotel: { trakia: 280, ayad: 149 }, // ayad is FLAT total (not per person)
-    pass: { none: 0, "1": 59, "2": 115, "3": 172 },
-    ski: {
-      individual: { normal: 20, online: 16 },
-      "2day": { normal: 40, online: 32 },
-      "3day": { normal: 56, online: 45 }
-    },
-    board: {
-      individual: { normal: 26, online: 20 },
-      "2day": { normal: 51, online: 45 },
-      "3day": { normal: 69, online: 55 }
-    },
-    gondola: 27
+  const P = {
+    hotel: 70,
+    takeoverGBP: 165,
+    takeoverDiscGBP: 155,
+    gbpEur: 1.15, // approx. conversion (£165 ≈ €190)
+    car: 150,  // car cost, split between everyone in it
+    fuel: 70,  // fuel cost, split between everyone sharing it
+    pass: { half: 40, full: 53 }, // per day
+    rent: {
+      ski:   { 1: 13.60, 2: 27.20, 3: 37.60 },
+      board: { 1: 18.40, 2: 36,    3: 48    }
+    }
+  };
+  const TAKEOVER_EUR = P.takeoverGBP * P.gbpEur;
+
+  // transport only counts once the slider has been moved
+  let carTouched = false;
+  document.getElementById("carPeople").addEventListener("input", () => { carTouched = true; });
+  // what each stay option costs per person, and what it's called
+  const STAY = {
+    eprox:        { name: "Ayad Trips (hotel)", cost: P.hotel }, // cost is updated from the price box
+    takeover:     { name: "Takeover Ski",             cost: TAKEOVER_EUR, pkg: true },
+    takeoverDisc: { name: "Takeover Ski (discounted)", cost: P.takeoverDiscGBP * P.gbpEur, pkg: true },
+    trakiaA:      { name: "Trakia Trips 5–8 March",   cost: 365, pkg: true },
+    trakiaB:      { name: "Trakia Trips 4–9 March",   cost: 490, pkg: true },
   };
 
   const $ = (id) => document.getElementById(id);
-  const money = (n) => "€" + Math.round(Number(n || 0));
-  const clampInt = (v, min) => {
-    v = parseInt(v || "0", 10);
-    return Number.isFinite(v) ? Math.max(min, v) : min;
-  };
-  const radio = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value;
+  const val = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value;
+  const money = (n) => "€" + (Number.isInteger(Math.round(n * 100) / 100) ? Math.round(n) : n.toFixed(2));
 
-  function renderPasses(people) {
-    const host = $("passesList");
-    host.innerHTML = "";
-    for (let i = 1; i <= people; i++) {
-      const div = document.createElement("div");
-      div.className = "itemCard";
-      div.innerHTML = `
-        <div class="itemHeader">
-          <b>Person #${i} — Lift pass</b>
-          <span class="muted" id="passPriceOut_${i}">€0</span>
-        </div>
+  function calc() {
+    // editable car and fuel prices
+    P.car = Math.max(0, Number($("carCost").value) || 0);
+    P.fuel = Math.max(0, Number($("fuelCost").value) || 0);
 
-        <label><input type="radio" name="pass_${i}" value="none" checked> <b>No pass</b></label>
-        <label><input type="radio" name="pass_${i}" value="1"> <b>1 day Ski pass</b> <span class="pill">€59</span></label>
-        <label><input type="radio" name="pass_${i}" value="2"> <b>2 day Ski pass</b> <span class="pill">€115</span></label>
-        <label><input type="radio" name="pass_${i}" value="3"> <b>3 day Ski pass</b> <span class="pill">€172</span></label>
-      `;
-      host.appendChild(div);
-    }
-  }
+    // editable Ayad Trips hotel price
+    P.hotel = Math.max(0, Number($("hotelPrice").value) || 0);
+    STAY.eprox.cost = P.hotel;
+    document.querySelectorAll(".hp").forEach((el) => el.textContent = money(P.hotel));
+    $("gapEur").textContent = money(Math.round(TAKEOVER_EUR - P.hotel));
+    $("hotelPriceBox").classList.toggle("hidden", val("hotel") !== "eprox");
 
-  /* Rentals: Ski (left) + Snowboard (right) side-by-side like old code */
-  function renderRentals(people) {
-    const host = $("rentalsList");
-    host.innerHTML = "";
-    for (let i = 1; i <= people; i++) {
-      const div = document.createElement("div");
-      div.className = "itemCard";
-      div.innerHTML = `
-        <div class="itemHeader">
-          <b>Person #${i} — Rentals</b>
-          <span class="muted" id="rentalPriceOut_${i}">€0</span>
-        </div>
+    const stayKey = val("hotel");
+    const hotel = STAY[stayKey].cost;
+    const isPkg = !!STAY[stayKey].pkg; // Takeover / Trakia packages include the bus
 
-        <label>
-          <input type="checkbox" id="noRental_${i}">
-          <b>No rentals for this person</b>
-        </label>
-
-        <div id="rentContent_${i}" style="margin-top:10px;">
-          <div class="row">
-
-            <!-- SKI COLUMN -->
-            <div class="col colCard">
-              <h3>Ski Rental</h3>
-
-              <label><input type="radio" name="skiPlan_${i}" value="none" checked> <b>No ski rental</b></label>
-
-              <label>
-                <input type="radio" name="skiPlan_${i}" value="individual">
-                <b>Individual day Ski</b> <span class="pill">€20/day</span> <span class="muted">(Online: €16)</span>
-              </label>
-
-              <div id="skiDaysBox_${i}" style="display:none;">
-                <label class="muted">How many days?</label>
-                <input type="number" min="1" value="1" id="skiDays_${i}">
-              </div>
-
-              <label>
-                <input type="radio" name="skiPlan_${i}" value="2day">
-                <b>2 day Ski</b> <span class="pill">€40</span> <span class="muted">(Online: €32)</span>
-              </label>
-
-              <label>
-                <input type="radio" name="skiPlan_${i}" value="3day">
-                <b>3 day Ski</b> <span class="pill">€56</span> <span class="muted">(Online: €45)</span>
-              </label>
-
-              <label style="margin-top:10px;">
-                <input type="checkbox" id="skiOnline_${i}"> Use online price
-              </label>
-            </div>
-
-            <!-- SNOWBOARD COLUMN -->
-            <div class="col colCard">
-              <h3>Snowboard Rental</h3>
-
-              <label><input type="radio" name="boardPlan_${i}" value="none" checked> <b>No snowboard rental</b></label>
-
-              <label>
-                <input type="radio" name="boardPlan_${i}" value="individual">
-                <b>Individual day Snowboard</b> <span class="pill">€26/day</span> <span class="muted">(Online: €20)</span>
-              </label>
-
-              <div id="boardDaysBox_${i}" style="display:none;">
-                <label class="muted">How many days?</label>
-                <input type="number" min="1" value="1" id="boardDays_${i}">
-              </div>
-
-              <label>
-                <input type="radio" name="boardPlan_${i}" value="2day">
-                <b>2 day Snowboard</b> <span class="pill">€51</span> <span class="muted">(Online: €45)</span>
-              </label>
-
-              <label>
-                <input type="radio" name="boardPlan_${i}" value="3day">
-                <b>3 day Snowboard</b> <span class="pill">€69</span> <span class="muted">(Online: €55)</span>
-              </label>
-
-              <label style="margin-top:10px;">
-                <input type="checkbox" id="boardOnline_${i}"> Use online price
-              </label>
-            </div>
-
-          </div>
-        </div>
-      `;
-      host.appendChild(div);
-    }
-  }
-
-  function updateRentalUI(people) {
-    for (let i = 1; i <= people; i++) {
-      const noRental = $(`noRental_${i}`)?.checked;
-      const box = $(`rentContent_${i}`);
-      if (box) box.style.display = noRental ? "none" : "block";
-
-      const skiPlan = document.querySelector(`input[name="skiPlan_${i}"]:checked`)?.value || "none";
-      const boardPlan = document.querySelector(`input[name="boardPlan_${i}"]:checked`)?.value || "none";
-
-      const skiDaysBox = $(`skiDaysBox_${i}`);
-      const boardDaysBox = $(`boardDaysBox_${i}`);
-
-      if (skiDaysBox) skiDaysBox.style.display = (skiPlan === "individual") ? "block" : "none";
-      if (boardDaysBox) boardDaysBox.style.display = (boardPlan === "individual") ? "block" : "none";
-    }
-  }
-
-  function calcTotal() {
-    const people = clampInt($("peopleCount").value, 1);
-
-    // show totals under hotel options
-    $("hotelTrakiaTotal").textContent = money(PRICES.hotel.trakia * people);
-    $("hotelAyadTotal").textContent = money(PRICES.hotel.ayad); // flat
-
-    // toggles
-    $("ownHotelBox").style.display = (radio("hotel") === "own") ? "block" : "none";
-    $("carBox").style.display = $("carEnabled").checked ? "block" : "none";
-    $("carPriceOut").textContent = money($("carPrice").value);
-    $("gondolaQtyBox").style.display = $("gondolaEnabled").checked ? "block" : "none";
-
-    updateRentalUI(people);
-
-    let total = 0;
-
-    // Hotel
-    const h = radio("hotel");
-    if (h === "own") total += Math.max(0, Number($("ownHotelPrice").value || 0));
-    else if (h === "trakia") total += PRICES.hotel.trakia * people;
-    else if (h === "ayad") total += PRICES.hotel.ayad;
-
-    // Car
-    if ($("carEnabled").checked) total += Math.max(0, Number($("carPrice").value || 0));
-
-    // Passes
-    for (let i = 1; i <= people; i++) {
-      const v = document.querySelector(`input[name="pass_${i}"]:checked`)?.value || "none";
-      const price = PRICES.pass[v] || 0;
-      const out = $(`passPriceOut_${i}`);
-      if (out) out.textContent = money(price);
-      total += price;
+    // car, split between everyone in it
+    const carPeople = Number($("carPeople").value);
+    $("carCard").classList.toggle("hidden", isPkg);
+    $("carPeopleOut").textContent = carPeople;
+    let carShare = 0;
+    if (!isPkg && carTouched) {
+      carShare = (P.car + P.fuel) / carPeople;
+      $("carShareOut").textContent = `Car ${money(P.car)} + fuel ${money(P.fuel)} = ${money(P.car + P.fuel)} ÷ ${carPeople} = ${money(carShare)} each`;
+    } else if (!isPkg) {
+      $("carShareOut").textContent = "Move the slider to add transport to your total.";
     }
 
-    // Rentals per person (Ski + Snowboard independently)
-    for (let i = 1; i <= people; i++) {
-      let personTotal = 0;
+    // pass
+    const pass = val("pass");
+    const passDays = Number(val("passDays"));
+    $("passDaysBox").classList.toggle("hidden", pass === "none");
+    const passCost = pass === "none" ? 0 : P.pass[pass] * passDays;
 
-      const noRental = $(`noRental_${i}`)?.checked;
-      if (!noRental) {
-        // Ski
-        const skiPlan = document.querySelector(`input[name="skiPlan_${i}"]:checked`)?.value || "none";
-        const skiOnline = !!$(`skiOnline_${i}`)?.checked;
+    // rental
+    const rent = val("rent");
+    const rentDays = Number(val("rentDays"));
+    $("rentDaysBox").classList.toggle("hidden", rent === "none");
+    const rentCost = rent === "none" ? 0 : P.rent[rent][rentDays];
 
-        if (skiPlan === "individual") {
-          const days = clampInt($(`skiDays_${i}`)?.value || 1, 1);
-          const perDay = skiOnline ? PRICES.ski.individual.online : PRICES.ski.individual.normal;
-          personTotal += days * perDay;
-        } else if (skiPlan === "2day" || skiPlan === "3day") {
-          personTotal += skiOnline ? PRICES.ski[skiPlan].online : PRICES.ski[skiPlan].normal;
-        }
+    const total = hotel + carShare + passCost + rentCost;
 
-        // Snowboard
-        const boardPlan = document.querySelector(`input[name="boardPlan_${i}"]:checked`)?.value || "none";
-        const boardOnline = !!$(`boardOnline_${i}`)?.checked;
-
-        if (boardPlan === "individual") {
-          const days = clampInt($(`boardDays_${i}`)?.value || 1, 1);
-          const perDay = boardOnline ? PRICES.board.individual.online : PRICES.board.individual.normal;
-          personTotal += days * perDay;
-        } else if (boardPlan === "2day" || boardPlan === "3day") {
-          personTotal += boardOnline ? PRICES.board[boardPlan].online : PRICES.board[boardPlan].normal;
-        }
-      }
-
-      const out = $(`rentalPriceOut_${i}`);
-      if (out) out.textContent = money(personTotal);
-      total += personTotal;
-    }
-
-    // Gondola
-    if ($("gondolaEnabled").checked) {
-      const qty = clampInt($("gondolaQty").value, 1);
-      total += qty * PRICES.gondola;
-    }
-
+    // receipt
+    const dayWord = (d) => d + (d === 1 ? " day" : " days");
+    $("rHotelLabel").textContent = STAY[stayKey].name;
+    $("rHotel").textContent = money(hotel);
+    $("rCarLabel").textContent = isPkg ? "Transport (bus included)" : carTouched ? `Car + fuel (share of ${carPeople})` : "Transport (not added yet)";
+    $("rCar").textContent = money(carShare);
+    $("rPassLabel").textContent = pass === "none" ? "Lift pass" : `Student ${pass} day pass × ${dayWord(passDays)}`;
+    $("rPass").textContent = money(passCost);
+    $("rRentLabel").textContent = rent === "none" ? "Rental" : `${rent === "ski" ? "Ski" : "Snowboard"} + boots, ${dayWord(rentDays)}`;
+    $("rRent").textContent = money(rentCost);
+    $("rTotal").textContent = money(total);
     $("totalOut").textContent = money(total);
+
+    // what you still save against every other trip (same pass and rental on their side)
+    const ayadCar = carTouched ? (P.car + P.fuel) / carPeople : 0;
+    const saves = Object.keys(STAY).filter((k) => k !== stayKey).map((k) => {
+      const theirs = STAY[k].cost + passCost + rentCost + (k === "eprox" ? ayadCar : 0);
+      return { name: STAY[k].name, diff: theirs - total };
+    }).filter((s) => s.diff > 0.005);
+    $("saveBox").classList.toggle("hidden", saves.length === 0);
+    $("saveRows").innerHTML = saves.map((s) =>
+      `<div class="row"><span>vs ${s.name}</span><span style="color:var(--good)">${money(s.diff)}</span></div>`).join("");
+
+    // highlight the chosen trip tile
+    Object.keys(STAY).forEach((k) => $("tile_" + k).classList.toggle("sel", k === stayKey));
   }
 
-  function hookAll() {
-    document.querySelectorAll("input, select").forEach(el => {
-      el.oninput = null; el.onchange = null;
-      el.addEventListener("input", calcTotal);
-      el.addEventListener("change", calcTotal);
+  // clicking a trip tile picks that trip in the calculator
+  document.querySelectorAll(".tile").forEach((tile) => {
+    tile.addEventListener("click", () => {
+      const r = document.querySelector(`input[name="hotel"][value="${tile.dataset.key}"]`);
+      r.checked = true;
+      calc();
     });
-  }
-
-  function rerenderPeople() {
-    const people = clampInt($("peopleCount").value, 1);
-    renderPasses(people);
-    renderRentals(people);
-    hookAll();
-    calcTotal();
-  }
-
-  $("peopleCount").addEventListener("input", rerenderPeople);
-
-  $("resetBtn").addEventListener("click", () => {
-    $("peopleCount").value = 1;
-    document.querySelector('input[name="hotel"][value="trakia"]').checked = true;
-    $("ownHotelPrice").value = 0;
-
-    $("carEnabled").checked = false;
-    $("carPrice").value = 60;
-
-    $("gondolaEnabled").checked = false;
-    $("gondolaQty").value = 1;
-
-    rerenderPeople();
   });
 
-  // init
-  rerenderPeople();
+  document.querySelectorAll("input").forEach((el) => {
+    el.addEventListener("input", calc);
+    el.addEventListener("change", calc);
+  });
+
+  $("resetBtn").addEventListener("click", () => {
+    document.querySelectorAll('input[type="radio"]').forEach((r) => {
+      r.checked = ["eprox", "none", "1"].includes(r.value) && !(r.name === "hotel" && r.value !== "eprox");
+    });
+    $("carPeople").value = 4;
+    carTouched = false;
+    $("hotelPrice").value = 70;
+    $("carCost").value = 150;
+    $("fuelCost").value = 70;
+    calc();
+  });
+
+  $("takeoverEur").textContent = Math.round(TAKEOVER_EUR);
+  $("takeoverDiscEur").textContent = Math.round(STAY.takeoverDisc.cost);
+  calc();
 </script>
 </body>
 </html>
